@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:redis="http://www.springframework.org/schema/redis"
+	xsi:schemaLocation="  
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans.xsd   
+            http://www.springframework.org/schema/redis
+            http://www.springframework.org/schema/redis/spring-redis.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">
+	<context:property-placeholder location="classpath:redis.properties" />
+	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxIdle" value="${redis.maxIdle}" />
+		<property name="maxTotal" value="${redis.maxActive}" />
+		<property name="maxWaitMillis" value="${redis.maxWait}" />
+		<property name="testOnBorrow" value="${redis.testOnBorrow}" />
+	</bean>
+
+	<bean id="connectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+		p:host-name="${redis.host}" p:port="${redis.port}" p:password="${redis.pass}"
+		p:pool-config-ref="poolConfig" />
+
+
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+		<property name="connectionFactory" ref="connectionFactory" />
+	</bean>
+
+	<!-- 生产消费 -->
+
+	<bean id="jedisQueueListener" class="com.zhan.app.queue.QueueListener" />
+	<bean id="jedisQueue" class="com.zhan.app.queue.RedisQueue"
+		destroy-method="destroy">
+		<property name="redisTemplate" ref="redisTemplate"></property>
+		<property name="jedisQueueListener" ref="jedisQueueListener"></property>
+	</bean>
+
+	<!-- pub/sub config -->
+
+	<!-- <bean id="messageListener" class="org.springframework.data.redis.listener.adapter.MessageListenerAdapter"> 
+		<constructor-arg> <bean class="com.zhan.app.redisclient.DefaultMessageDelegate" 
+		/> </constructor-arg> </bean> <bean id="redisContainer" class="org.springframework.data.redis.listener.RedisMessageListenerContainer"> 
+		<property name="connectionFactory" ref="connectionFactory" /> <property name="messageListeners"> 
+		<map> <entry key-ref="messageListener"> <bean class="org.springframework.data.redis.listener.ChannelTopic"> 
+		<constructor-arg value="news" /> </bean> </entry> </map> </property> </bean> -->
+</beans>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!-- 启动自动扫描 该包下所有的Bean(@Controller) -->
+	<context:component-scan base-package="com.zhan.app.controller" />
+
+
+	<!-- 拦截器 -->
+	<bean id="handlerMapping"
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+	</bean>
+	<!-- <bean id="paramInterceptor" class="com.zhan.app.spider.filter.ParamInterceptor" 
+		/> -->
+
+
+	<!-- 输出对象转JSON支持 -->
+
+
+	<!-- 绑定数据类型 -->
+	<!-- 解决日期类型数据绑定问题 -->
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
+
+	<bean id="webBindingInitializer"
+		class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+		<property name="conversionService" ref="conversionService"></property>
+	</bean>
+
+	<!-- 请求处理返回数据类型 -->
+	<bean
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="fastjsonMessageConverter"></ref>
+			</list>
+		</property>
+		<property name="webBindingInitializer" ref="webBindingInitializer">
+		</property>
+	</bean>
+
+
+
+	<bean id="fastjsonMessageConverter"
+		class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+				<value>application/json</value>
+			</list>
+		</property>
+		<property name="features">
+			<list>
+				<!-- 是否显示值为null的字段<value>WriteMapNullValue</value> -->
+				<value>QuoteFieldNames</value>
+			</list>
+		</property>
+	</bean>
+
+
+
+
+
+	<!-- 系统异常拦截 -->
+	<bean class="com.zhan.app.exception.AppExceptionHandler" />
+
+
+
+	<!-- 定义视图解析器 -->
+	<bean id="jspViewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+</beans>
