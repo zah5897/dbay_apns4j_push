@@ -32,17 +32,17 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 			@Override
 			public void run() {
 				while (true) {
-					
-					try{
-					String msg = redisTemplate.opsForList().rightPop(RedisKeys.KEY_NEWS_PUSH, 0, TimeUnit.SECONDS);
-					if (msg == null) {
-						System.out.println("rightPop msg is null");
-					}else{
-						if (jedisQueueListener != null) {
-							jedisQueueListener.onMessage(msg);
-						}	
-					}
-					}catch(Exception e){
+
+					try {
+						String msg = redisTemplate.opsForList().rightPop(RedisKeys.KEY_NEWS_PUSH, 0, TimeUnit.SECONDS);
+						if (msg == null) {
+							System.out.println("rightPop msg is null");
+						} else {
+							if (jedisQueueListener != null) {
+								jedisQueueListener.onMessage(msg);
+							}
+						}
+					} catch (Exception e) {
 						try {
 							Thread.sleep(5000);
 						} catch (InterruptedException e1) {
@@ -51,7 +51,7 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 						}
 						System.err.println(e);
 					}
-					
+
 				}
 			}
 		}.start();

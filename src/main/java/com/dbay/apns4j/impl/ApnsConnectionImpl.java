@@ -177,8 +177,8 @@ public class ApnsConnectionImpl implements IApnsConnection {
 				logger.error(String.format("%s Notification send failed. %s", connName, notification));
 				return;
 			} else {
-				logger.info(String.format("%s Send success. count: %s, notificaion: %s", connName, 
-						notificaionSentCount.incrementAndGet(), notification));
+//				logger.info(String.format("%s Send success. count: %s, notificaion: %s", connName, 
+//						notificaionSentCount.incrementAndGet(), notification));
 				
 				notificationCachedQueue.add(notification);
 				lastSuccessfulTime = System.currentTimeMillis();
