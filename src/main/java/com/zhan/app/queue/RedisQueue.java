@@ -32,16 +32,18 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 			@Override
 			public void run() {
 				while (true) {
-
+					System.out.println(redisTemplate.isExposeConnection());
 					try {
+						System.out.println("before rightPop msg");
 						String msg = redisTemplate.opsForList().rightPop(RedisKeys.KEY_NEWS_PUSH, 0, TimeUnit.SECONDS);
-						if (msg == null) {
-							System.out.println("rightPop msg is null");
-						} else {
+						if (msg != null) {
+							System.out.println("new push task.");
 							if (jedisQueueListener != null) {
 								jedisQueueListener.onMessage(msg);
 							}
+							System.out.println("new push task over.");
 						}
+						continue;
 					} catch (Exception e) {
 						try {
 							Thread.sleep(5000);
@@ -50,9 +52,12 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 							e1.printStackTrace();
 						}
 						System.err.println(e);
+						System.out.println("while true out error.");
 					}
-
+					System.out.println("while true out error.");
+					continue;
 				}
+
 			}
 		}.start();
 	}

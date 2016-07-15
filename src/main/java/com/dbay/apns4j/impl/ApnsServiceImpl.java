@@ -15,6 +15,7 @@
  */
 package com.dbay.apns4j.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,7 @@ public class ApnsServiceImpl implements IApnsService {
 				try {
 					conn = getConnection();
 					conn.sendNotification(token, payload);
+					System.out.println("push task complete!"+new Date().toLocaleString());
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 				} finally {
