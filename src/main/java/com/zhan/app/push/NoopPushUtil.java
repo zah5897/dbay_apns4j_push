@@ -9,15 +9,17 @@ import com.dbay.apns4j.demo.Apns4jDemo;
 import com.dbay.apns4j.impl.ApnsServiceImpl;
 import com.dbay.apns4j.model.ApnsConfig;
 import com.dbay.apns4j.model.Payload;
+import com.zhan.app.util.TextUtils;
 
 public class NoopPushUtil {
 
-	private static IApnsService apnsService;
 
-	private static IApnsService getApnsService() {
+	private static IApnsService getApnsService(String app_name) {
+		
+		IApnsService apnsService=ApnsServiceImpl.getCachedService(app_name);
 		if (apnsService == null) {
 			ApnsConfig config = new ApnsConfig();
-			InputStream is = Apns4jDemo.class.getClassLoader().getResourceAsStream("dis.p12");
+			InputStream is = Apns4jDemo.class.getClassLoader().getResourceAsStream("dis_"+app_name+".p12");
 			config.setKeyStore(is);
 			config.setDevEnv(false);
 			config.setPassword("magicpush");
@@ -33,7 +35,12 @@ public class NoopPushUtil {
 		if (msg == null) {
 			return false;
 		}
-		IApnsService service = getApnsService();
+		
+		if(TextUtils.isEmpty(msg.app_name)){
+			return false;
+		}
+		
+		IApnsService service = getApnsService(msg.app_name);
 		
 		Map<String, String> info = new HashMap<String, String>();
 		info.put("type", "0");

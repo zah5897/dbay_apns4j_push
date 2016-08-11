@@ -20,9 +20,16 @@ public class PushManager {
 	}
 
 	public void push(PushMsg pushMsg) {
+		long now=System.currentTimeMillis()/1000/60;
+		
+		long timeOut=now-pushMsg.time;
+		if(timeOut>90){ //分钟
+			System.out.println("time out :"+timeOut);
+			return;
+		}
 		pushUtil.pushNews(pushMsg);
 	}
-
+ 
 	public void commitTask(String message) {
 		if (TextUtils.isEmpty(message)) {
 			return;
@@ -39,6 +46,8 @@ public class PushManager {
 				pushMsg.id = obj.getString("id");
 				pushMsg.token = obj.getString("token");
 				pushMsg.alert = obj.getString("alert");
+				pushMsg.app_name = obj.getString("app_name");
+				pushMsg.time= obj.getLongValue("time");
 			}
 		} catch (Exception e) {
 
