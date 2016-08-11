@@ -20,13 +20,13 @@ public class PushManager {
 	}
 
 	public void push(PushMsg pushMsg) {
-		long now=System.currentTimeMillis()/1000/60;
-		
-		long timeOut=now-pushMsg.time;
-		if(timeOut>90){ //分钟
-			System.out.println("time out :"+timeOut);
-			return;
-		}
+//		long now=System.currentTimeMillis()/1000/60;
+//		
+//		long timeOut=now-pushMsg.time;
+//		if(timeOut>90){ //分钟
+//			System.out.println("time out :"+timeOut);
+//			return;
+//		}
 		pushUtil.pushNews(pushMsg);
 	}
  
