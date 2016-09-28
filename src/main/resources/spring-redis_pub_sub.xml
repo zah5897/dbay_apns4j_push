@@ -30,11 +30,9 @@
 
 	<!-- 生产消费 -->
 
-	<bean id="jedisQueueListener" class="com.zhan.app.queue.QueueListener" />
 	<bean id="jedisQueue" class="com.zhan.app.queue.RedisQueue"
 		destroy-method="destroy">
 		<property name="redisTemplate" ref="redisTemplate"></property>
-		<property name="jedisQueueListener" ref="jedisQueueListener"></property>
 	</bean>
 
 	<!-- pub/sub config -->
