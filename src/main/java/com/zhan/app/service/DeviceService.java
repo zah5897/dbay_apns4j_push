@@ -14,6 +14,12 @@ public class DeviceService {
 	@Resource
 	protected MongoTemplate mongoTemplate;
 
+	public void removeToken(String errorToken,String collectionName) {
+		Query query = new Query();
+		Criteria criteria = Criteria.where("token").is(errorToken);
+		query.addCriteria(criteria);
+		mongoTemplate.remove(query, User.class,collectionName);
+	}
 	public void removeToken(String errorToken) {
 		Query query = new Query();
 		Criteria criteria = Criteria.where("token").is(errorToken);
