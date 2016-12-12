@@ -48,6 +48,7 @@ public class PushManager {
 				pushMsg.alert = obj.getString("alert");
 				pushMsg.app_name = obj.getString("app_name");
 				pushMsg.time= obj.getLongValue("time");
+				pushMsg.type=obj.getIntValue("type");
 			}
 		} catch (Exception e) {
 

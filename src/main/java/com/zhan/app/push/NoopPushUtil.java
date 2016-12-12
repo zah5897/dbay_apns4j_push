@@ -12,11 +12,19 @@ import com.dbay.apns4j.model.Payload;
 import com.zhan.app.util.TextUtils;
 
 public class NoopPushUtil {
-	private static IApnsService getApnsService(String app_name) {
+	private static IApnsService getApnsService(int type, String app_name) {
 		IApnsService apnsService = ApnsServiceImpl.getCachedService(app_name);
 		if (apnsService == null) {
+
+			String signName = null;
+			if (type == 0) {
+				signName = "dis_" + app_name + ".p12";
+			} else {
+				signName = "dev_" + app_name + ".p12";
+			}
+
 			ApnsConfig config = new ApnsConfig();
-			InputStream is = Apns4jDemo.class.getClassLoader().getResourceAsStream("dis_" + app_name + ".p12");
+			InputStream is = Apns4jDemo.class.getClassLoader().getResourceAsStream(signName);
 			config.setKeyStore(is);
 			config.setDevEnv(false);
 			config.setPassword("magicpush");
@@ -35,7 +43,7 @@ public class NoopPushUtil {
 		if (TextUtils.isEmpty(msg.app_name)) {
 			return false;
 		}
-		IApnsService service = getApnsService(msg.app_name);
+		IApnsService service = getApnsService(msg.type,msg.app_name);
 		Map<String, String> info = new HashMap<String, String>();
 		info.put("type", "0");
 		info.put("id", msg.id);
@@ -57,11 +65,11 @@ public class NoopPushUtil {
 	}
 
 	public static void main(String[] args) {
-		PushMsg pm=new PushMsg();
-		pm.app_name="news";
-		pm.alert="test";
-		pm.token="e8acacd7f67a13464f36b2b64e9393ae5d7733ee"; //假token
-		pm.id="123"; //假token
+		PushMsg pm = new PushMsg();
+		pm.app_name = "news";
+		pm.alert = "test";
+		pm.token = "e8acacd7f67a13464f36b2b64e9393ae5d7733ee"; // 假token
+		pm.id = "123"; // 假token
 		new NoopPushUtil().pushNews(pm);
 	}
 }

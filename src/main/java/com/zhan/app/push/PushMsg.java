@@ -8,5 +8,6 @@ public class PushMsg {
 	public String token;
 	public String id;
 	public long time;
-	
+	public int type = 0;
+
 }
