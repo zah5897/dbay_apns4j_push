@@ -55,8 +55,9 @@ public class ApnsServiceImpl implements IApnsService {
 	private ExecutorService service = null;
 	private ApnsConnectionPool connPool = null;
 	private IApnsFeedbackConnection feedbackConn = null;
-
-	private ApnsServiceImpl(ApnsConfig config) {
+    private String appName;
+	private ApnsServiceImpl(ApnsConfig config,String appName) {
+		this.appName=appName;
 		service = initExecute();
 		SocketFactory factory = ApnsTools.createSocketFactory(config.getKeyStore(), config.getPassword(), KEYSTORE_TYPE,
 				ALGORITHM, PROTOCOL);
@@ -159,7 +160,7 @@ public class ApnsServiceImpl implements IApnsService {
 			synchronized (name.intern()) {
 				service = getCachedService(name);
 				if (service == null) {
-					service = new ApnsServiceImpl(config);
+					service = new ApnsServiceImpl(config,name);
 					serviceCacheMap.put(name, service);
 				}
 			}

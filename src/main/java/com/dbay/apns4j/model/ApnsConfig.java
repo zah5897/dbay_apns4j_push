@@ -55,7 +55,7 @@ public class ApnsConfig {
 	 * CN: 根据哥的经验，APNS服务器连接的idle时间为两小时，判断下，如果两条通知的间隔时间超过30分钟，就重新建立连接
 	 *     一个连接空闲2小时后，用netstat查看，会处于CLOSE_WAIT状态，但应用层可能并不知道。此时再发通知已经发不出去了，所以需要重连
 	 * 
-	 * TODO This client will support auto closing connection which is idle for a specific time.
+	 *   This client will support auto closing connection which is idle for a specific time.
 	 */
 	private int intervalTime = 30 * 60 * 1000; // 30 minutes
 	

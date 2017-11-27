@@ -27,13 +27,17 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 	}
 
 	private void startPoll() {
+		newsPoll();
+		nearbyPool();
+	}
 
+	// 新闻推送
+	private void newsPoll() {
 		// 新闻推送
 		new Thread() {
 			@Override
 			public void run() {
 				while (true) {
-					System.out.println(redisTemplate.isExposeConnection());
 					try {
 						String msg = redisTemplate.opsForList().rightPop(RedisKeys.KEY_NEWS_PUSH, 0, TimeUnit.SECONDS);
 						if (msg != null) {
@@ -46,22 +50,25 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}
+						e.printStackTrace();
 						System.out.println("while true out error.");
 					}
-					System.out.println("while true out error.");
 					continue;
 				}
 
 			}
 		}.start();
+	}
+	// 附近推送
 
+	private void nearbyPool() {
 		// 附近推送
 		new Thread() {
 			@Override
 			public void run() {
 				while (true) {
-					System.out.println(redisTemplate.isExposeConnection());
 					try {
+
 						String msg = redisTemplate.opsForList().rightPop(RedisKeys.KEY_NEARBY_PUSH, 0,
 								TimeUnit.SECONDS);
 						if (msg != null) {
@@ -74,7 +81,6 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}
-						System.out.println("while true out error.");
 					}
 					System.out.println("while true out error.");
 					continue;

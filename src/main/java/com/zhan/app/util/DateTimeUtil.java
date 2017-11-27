@@ -52,7 +52,6 @@ public class DateTimeUtil {
 		try {
 			return sdf.parse(strDate);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

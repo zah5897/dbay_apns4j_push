@@ -26,7 +26,7 @@ public class NoopPushUtil {
 			ApnsConfig config = new ApnsConfig();
 			InputStream is = Apns4jDemo.class.getClassLoader().getResourceAsStream(signName);
 			config.setKeyStore(is);
-			config.setDevEnv(false);
+			config.setDevEnv(type != 0);
 			config.setPassword("magicpush");
 			config.setPoolSize(10);
 			// 假如需要在同个java进程里给不同APP发送通知，那就需要设置为不同的name
@@ -43,10 +43,11 @@ public class NoopPushUtil {
 		if (TextUtils.isEmpty(msg.app_name)) {
 			return false;
 		}
-		IApnsService service = getApnsService(msg.type,msg.app_name);
+		IApnsService service = getApnsService(msg.type, msg.app_name);
 		Map<String, String> info = new HashMap<String, String>();
 		info.put("type", "0");
 		info.put("id", msg.id);
+		info.put("msg_id", String.valueOf(msg.msg_id));
 		Payload payload = new Payload();
 		payload.setAlert(msg.alert);
 		// send notification
