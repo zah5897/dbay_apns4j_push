@@ -98,7 +98,7 @@ public class ApnsServiceImpl implements IApnsService {
 				try {
 					conn = getConnection();
 					conn.sendNotification(token, payload);
-					System.out.println("push task complete!"+new Date().toLocaleString());
+					//System.out.println("push task complete!"+new Date().toLocaleString());
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 				} finally {

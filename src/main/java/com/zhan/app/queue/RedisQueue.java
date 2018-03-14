@@ -16,6 +16,8 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 	@Resource
 	protected RedisTemplate<String, String> redisTemplate;
 
+	private int i = 0;
+
 	public void destroy() throws Exception {
 
 	}
@@ -31,17 +33,25 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 		nearbyPool();
 	}
 
-	// 新闻推送
+	// 鏂伴椈鎺ㄩ��
 	private void newsPoll() {
-		// 新闻推送
+		// 鏂伴椈鎺ㄩ��
 		new Thread() {
 			@Override
 			public void run() {
+				System.out.println("start ready to push task.");
 				while (true) {
 					try {
 						String msg = redisTemplate.opsForList().rightPop(RedisKeys.KEY_NEWS_PUSH, 0, TimeUnit.SECONDS);
 						if (msg != null) {
 							PushManager.getInstance().commitTask(msg);
+							if (i == 100) {
+								System.out.println("----------new push---------");
+								i = 0;
+							} else {
+								i++;
+							}
+
 						}
 						continue;
 					} catch (Exception e) {
@@ -59,10 +69,10 @@ public class RedisQueue<T> implements InitializingBean, DisposableBean {
 			}
 		}.start();
 	}
-	// 附近推送
+	// 闄勮繎鎺ㄩ��
 
 	private void nearbyPool() {
-		// 附近推送
+		// 闄勮繎鎺ㄩ��
 		new Thread() {
 			@Override
 			public void run() {
