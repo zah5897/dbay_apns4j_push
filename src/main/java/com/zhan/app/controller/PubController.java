@@ -18,7 +18,7 @@ public class PubController {
 
 	@RequestMapping("topub")
 	public String pub(HttpServletRequest request,String token, String content) {
-
+		org.springframework.web.util.Log4jConfigListener sl;
 		JSONObject object = new JSONObject();
 		String title = content;
 		object.put("id", "5776326d016d286fa9c71744");

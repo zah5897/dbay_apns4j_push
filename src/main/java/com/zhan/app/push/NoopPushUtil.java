@@ -15,7 +15,6 @@ public class NoopPushUtil {
 	private static IApnsService getApnsService(int type, String app_name) {
 		IApnsService apnsService = ApnsServiceImpl.getCachedService(app_name);
 		if (apnsService == null) {
-
 			String signName = null;
 			if (type == 0) {
 				signName = "dis_" + app_name + ".p12";

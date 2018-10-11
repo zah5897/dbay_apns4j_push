@@ -19,7 +19,6 @@ import static com.dbay.apns4j.model.ApnsConstants.ALGORITHM;
 import static com.dbay.apns4j.model.ApnsConstants.KEYSTORE_TYPE;
 import static com.dbay.apns4j.model.ApnsConstants.PROTOCOL;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +66,9 @@ public class ApnsServiceImpl implements IApnsService {
 
 	private ExecutorService initExecute() {
 		int fixPool = getPoolSize();
+		System.out.println("线程池大小："+fixPool);
+		fixPool = getFixPoolSize();
+		System.out.println("线程池大小："+fixPool);
 		ExecutorService executor = new ThreadPoolExecutor(fixPool, fixPool, 1000L, TimeUnit.MILLISECONDS,
 				new ArrayBlockingQueue<Runnable>(fixPool), new RejectedExecutionHandler() {
 
@@ -74,7 +76,7 @@ public class ApnsServiceImpl implements IApnsService {
 						if (!executor.isShutdown()) {
 							try {
 								System.out.println(
-										"******************************线程池已经满了，请等待****************************");
+										"******************************线程池已满："+appName+"，证书可能过期，请注意****************************");
 								executor.getQueue().put(r);
 							} catch (InterruptedException e) {
 							}
@@ -84,11 +86,17 @@ public class ApnsServiceImpl implements IApnsService {
 		return executor;
 	}
 
+	//根据当前计算机cpu数量定义大小
 	private int getPoolSize() {
-		int numberOfCores = Runtime.getRuntime().availableProcessors(); // 获得核心数
-		double blockingCoefficient = 0.9;// 阻塞系数
-		int poolSize = (int) (numberOfCores / (1 - blockingCoefficient)); // 求得线程数大小
+		int numberOfCores = Runtime.getRuntime().availableProcessors(); // 鑾峰緱鏍稿績鏁�
+		double blockingCoefficient = 0.9;// 闃诲绯绘暟
+		int poolSize = (int) (numberOfCores / (1 - blockingCoefficient)); // 姹傚緱绾跨▼鏁板ぇ灏�
 		return poolSize;
+	}
+	
+	
+	private int getFixPoolSize() {
+		return 30;
 	}
 
 	public void sendNotification(final String token, final Payload payload) {
