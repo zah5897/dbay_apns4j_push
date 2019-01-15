@@ -41,6 +41,7 @@ import com.dbay.apns4j.model.Feedback;
 import com.dbay.apns4j.model.Payload;
 import com.dbay.apns4j.model.PushNotification;
 import com.dbay.apns4j.tools.ApnsTools;
+import com.zhan.app.push.PushRunable;
 
 /**
  * The service should be created twice at most. One for the development env, and
@@ -54,9 +55,10 @@ public class ApnsServiceImpl implements IApnsService {
 	private ExecutorService service = null;
 	private ApnsConnectionPool connPool = null;
 	private IApnsFeedbackConnection feedbackConn = null;
-    private String appName;
-	private ApnsServiceImpl(ApnsConfig config,String appName) {
-		this.appName=appName;
+	private String appName;
+
+	private ApnsServiceImpl(ApnsConfig config, String appName) {
+		this.appName = appName;
 		service = initExecute();
 		SocketFactory factory = ApnsTools.createSocketFactory(config.getKeyStore(), config.getPassword(), KEYSTORE_TYPE,
 				ALGORITHM, PROTOCOL);
@@ -66,18 +68,17 @@ public class ApnsServiceImpl implements IApnsService {
 
 	private ExecutorService initExecute() {
 		int fixPool = getPoolSize();
-		System.out.println("线程池大小："+fixPool);
+		System.out.println("线程池大小：" + fixPool);
 		fixPool = getFixPoolSize();
-		System.out.println("线程池大小："+fixPool);
+		System.out.println("线程池大小：" + fixPool);
 		ExecutorService executor = new ThreadPoolExecutor(fixPool, fixPool, 1000L, TimeUnit.MILLISECONDS,
 				new ArrayBlockingQueue<Runnable>(fixPool), new RejectedExecutionHandler() {
 
 					public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 						if (!executor.isShutdown()) {
 							try {
-								System.out.println(
-										"******************************线程池已满："+appName+"，证书可能过期，请注意****************************");
-								executor.getQueue().put(r);
+								PushRunable run = (PushRunable) r;
+								run.addToQueue(executor.getQueue());
 							} catch (InterruptedException e) {
 							}
 						}
@@ -86,57 +87,47 @@ public class ApnsServiceImpl implements IApnsService {
 		return executor;
 	}
 
-	//根据当前计算机cpu数量定义大小
+	// 根据当前计算机cpu数量定义大小
 	private int getPoolSize() {
 		int numberOfCores = Runtime.getRuntime().availableProcessors(); // 鑾峰緱鏍稿績鏁�
 		double blockingCoefficient = 0.9;// 闃诲绯绘暟
 		int poolSize = (int) (numberOfCores / (1 - blockingCoefficient)); // 姹傚緱绾跨▼鏁板ぇ灏�
 		return poolSize;
 	}
-	
-	
+
 	private int getFixPoolSize() {
 		return 30;
 	}
 
-	public void sendNotification(final String token, final Payload payload) {
-		service.execute(new Runnable() {
-			public void run() {
-				IApnsConnection conn = null;
-				try {
-					conn = getConnection();
-					conn.sendNotification(token, payload);
-					//System.out.println("push task complete!"+new Date().toLocaleString());
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-				} finally {
-					if (conn != null) {
-						connPool.returnConn(conn);
-					}
-				}
-			}
-		});
+	public void sendNotification(String token, Payload payload) {
+		PushRunable runable = new PushRunable(token, payload, appName);
+		service.execute(runable);
 	}
 
 	public void sendNotification(final PushNotification notification) {
-		service.execute(new Runnable() {
-			public void run() {
-				IApnsConnection conn = null;
-				try {
-					conn = getConnection();
-					conn.sendNotification(notification);
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-				} finally {
-					if (conn != null) {
-						connPool.returnConn(conn);
-					}
-				}
-			}
-		});
+//		service.execute(new Runnable() {
+//			public void run() {
+//				IApnsConnection conn = null;
+//				try {
+//					conn = getConnection();
+//					conn.sendNotification(notification);
+//				} catch (Exception e) {
+//					logger.error(e.getMessage(), e);
+//				} finally {
+//					if (conn != null) {
+//						connPool.returnConn(conn);
+//					}
+//				}
+//			}
+//		});
 	}
 
-	private IApnsConnection getConnection() {
+	@Override
+	public ApnsConnectionPool getConnectPool() {
+		return connPool;
+	}
+
+	public IApnsConnection getConnection() {
 		IApnsConnection conn = connPool.borrowConn();
 		if (conn == null) {
 			throw new RuntimeException("Can't get apns connection");
@@ -168,7 +159,7 @@ public class ApnsServiceImpl implements IApnsService {
 			synchronized (name.intern()) {
 				service = getCachedService(name);
 				if (service == null) {
-					service = new ApnsServiceImpl(config,name);
+					service = new ApnsServiceImpl(config, name);
 					serviceCacheMap.put(name, service);
 				}
 			}
@@ -189,4 +180,5 @@ public class ApnsServiceImpl implements IApnsService {
 	public List<Feedback> getFeedbacks() {
 		return feedbackConn.getFeedbacks();
 	}
+
 }

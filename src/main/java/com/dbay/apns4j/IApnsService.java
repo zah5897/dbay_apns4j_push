@@ -17,6 +17,7 @@ package com.dbay.apns4j;
 
 import java.util.List;
 
+import com.dbay.apns4j.impl.ApnsConnectionPool;
 import com.dbay.apns4j.model.Feedback;
 import com.dbay.apns4j.model.Payload;
 import com.dbay.apns4j.model.PushNotification;
@@ -48,4 +49,9 @@ public interface IApnsService {
 	 * @return the device tokens which belong to the app that doesn't exist on the device.
 	 */
 	public List<Feedback> getFeedbacks();
+	
+	
+	public IApnsConnection getConnection();
+	
+	public ApnsConnectionPool getConnectPool();
 }
